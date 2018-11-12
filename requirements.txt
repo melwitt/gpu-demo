@@ -1,0 +1,5 @@
+deepspeech-gpu
+googletrans
+jamspell
+numpy
+webrtcvad
