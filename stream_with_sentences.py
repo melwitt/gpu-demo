@@ -41,7 +41,6 @@ for opt, arg in opts:
 
 print TRANSLATION_LANGUAGE +  " " + WAVE_FILE
 
-#TRANSLATION_LANGUAGE = "pl"
 MODEL = MODEL_DIR + "/output_graph.pbmm"
 ALPHABET = MODEL_DIR + "/alphabet.txt"
 LM = MODEL_DIR + "/lm.binary"
