@@ -9,12 +9,43 @@ import collections
 import time
 import curses
 import textwrap
+import sys
+import getopt
 
+TRANSLATION_LANGUAGE = ''
+WAVE_FILE = ''
+MODEL_DIR = ''
 
-MODEL = "models/output_graph.pbmm"
-ALPHABET = "models/alphabet.txt"
-LM = "models/lm.binary"
-TRIE = "models/trie"
+def usage():
+    print "Usage:" + sys.argv[0] + " --lang <en|de|es|fr|pl> --file </path/to/.wav> --models </path/to/models>"
+
+try:
+    opts, args = getopt.getopt(sys.argv[1:], 'l:f:m:h', ['lang=', 'file=', 'models=', 'help'])
+except getopt.GetoptError:
+    usage()
+    sys.exit(2)
+
+for opt, arg in opts:
+    if opt in ('-h', '--help'):
+        usage()
+        sys.exit(2)
+    elif opt in ('-l', '--lang'):
+        TRANSLATION_LANGUAGE = arg
+    elif opt in ('-f', '--file'):
+        WAVE_FILE = arg
+    elif opt in ('-m', '--models'):
+        MODEL_DIR = arg
+    else:
+        usage()
+        sys.exit(2)
+
+print TRANSLATION_LANGUAGE +  " " + WAVE_FILE
+
+#TRANSLATION_LANGUAGE = "pl"
+MODEL = MODEL_DIR + "/output_graph.pbmm"
+ALPHABET = MODEL_DIR + "/alphabet.txt"
+LM = MODEL_DIR + "/lm.binary"
+TRIE = MODEL_DIR + "/trie"
 
 LM_WEIGHT = 1.50
 VALID_WORD_COUNT_WEIGHT = 2.25
@@ -126,7 +157,7 @@ model = ds.Model(MODEL, N_FEATURES, N_CONTEXT, ALPHABET, BEAM_WIDTH)
 model.enableDecoderWithLM(ALPHABET, LM, TRIE, LM_WEIGHT,
                           VALID_WORD_COUNT_WEIGHT)
 
-fin = wave.open(sys.argv[1], 'rb')
+fin = wave.open(WAVE_FILE, 'rb')
 
 frame_rate = fin.getframerate()
 bit_depth = fin.getsampwidth()
@@ -178,7 +209,7 @@ try:
                 corrected = corrector.FixFragment(new_text)
                 segment_cache[i]['corrected'] = corrected
                 translated = translator.translate(corrected, src='en',
-                                                  dest='de').text
+                                                  dest=TRANSLATION_LANGUAGE).text
                 segment_cache[i]['translated'] = translated.encode('utf-8')
             text = ''.join([text, '' if not text else ' ',
                             segment_cache[i]['corrected']])
@@ -199,7 +230,7 @@ try:
         stdscr.refresh()
     # Show the final output and re-translate
     stdscr.erase()
-    translated_text = translator.translate(text, src='en', dest='de').text
+    translated_text = translator.translate(text, src='en', dest=TRANSLATION_LANGUAGE).text
     wrapped_translated_text = textwrap.fill(translated_text.encode('utf8'),
                                             win_width)
     stdscr.addstr(0, 0, wrapped_text)
