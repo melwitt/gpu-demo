@@ -7,11 +7,11 @@ Uses deepspeech and tensorflow to recognize voice recording in english and trans
 * Python2-devel
 * Development tools and libraries (gcc, etc)
 * Python modules
-** deepspeech or deepspeech-gpu
-** googletrans
-** jamspell
-** numpy
-** webrtcvad
+  * deepspeech or deepspeech-gpu
+  * googletrans
+  * jamspell
+  * numpy
+  * webrtcvad
 
 ## Usage
 The translation language can be anything supported by [google translate](https://cloud.google.com/translate/docs/languages). Use the ISO-639-1 code.
