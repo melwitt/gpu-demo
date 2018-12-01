@@ -11,6 +11,7 @@ import curses
 import textwrap
 import sys
 import getopt
+import locale
 
 TRANSLATION_LANGUAGE = ''
 WAVE_FILE = ''
@@ -39,7 +40,15 @@ for opt, arg in opts:
         usage()
         sys.exit(2)
 
-print TRANSLATION_LANGUAGE +  " " + WAVE_FILE
+# Set locale for translated language or use default locale
+LOCALE = TRANSLATION_LANGUAGE + "_" + TRANSLATION_LANGUAGE.upper() + ".utf8"
+print "Locale set to " + LOCALE
+
+try: 
+    locale.setlocale(locale.LC_ALL, LOCALE)
+except locale.Error:
+    print "WARNING: Locale " + LOCALE + " not found. Ensure you have language pack installed! Falling back to default LOCALE" 
+    locale.setlocale(locale.LC_ALL, '')
 
 MODEL = MODEL_DIR + "/output_graph.pbmm"
 ALPHABET = MODEL_DIR + "/alphabet.txt"
