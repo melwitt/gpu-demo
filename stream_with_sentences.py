@@ -234,7 +234,7 @@ try:
         wrapped_text = textwrap.fill(text, win_width - 2)
         wrapped_translated_text = textwrap.fill(translated_text, win_width - 2)
         stdscr.addstr(0, 0, wrapped_text)
-        stdscr.addstr(5, 0, wrapped_translated_text, curses.color_pair(1))
+        stdscr.addstr(15, 0, wrapped_translated_text, curses.color_pair(1))
         stdscr.refresh()
     # Show the final output and re-translate
     stdscr.erase()
@@ -242,9 +242,9 @@ try:
     wrapped_translated_text = textwrap.fill(translated_text.encode('utf8'),
                                             win_width)
     stdscr.addstr(0, 0, wrapped_text)
-    stdscr.addstr(5, 0, wrapped_translated_text, curses.color_pair(1))
+    stdscr.addstr(15, 0, wrapped_translated_text, curses.color_pair(1))
     stdscr.refresh()
-    time.sleep(5)
+    time.sleep(20)
 except KeyboardInterrupt:
     pass
 finally:
