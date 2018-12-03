@@ -1,5 +1,9 @@
 FROM docker.io/fedora:27
 
+
+LABEL ios.k8s.display-name="deepspeech" \
+    maintainer="Keith Tenzer <ktenzer@redhat.com>"
+
 RUN dnf groupinstall -y 'C Development Tools and Libraries'
 RUN dnf install -y python2 \
     python2-devel \
@@ -38,6 +42,12 @@ RUN git clone https://github.com/ktenzer/gpu-demo.git /deepspeech/gpu-demo
 
 COPY demo.wav /deepspeech
 
-RUN chown -R 1001:0 /deepspeech
+RUN chown -R 1001:0 /deepspeech && \
+    chown -R 1001:0 $HOME
+
+RUN echo "1.0" > /etc/imageversion
 
 USER 1001
+
+CMD ["-c", "--", "while true; do sleep 30; done;"]
+ENTRYPOINT ["/bin/bash"]
