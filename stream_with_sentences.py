@@ -18,10 +18,10 @@ WAVE_FILE = ''
 MODEL_DIR = ''
 
 def usage():
-    print "Usage:" + sys.argv[0] + " --lang <en|de|es|fr|pl> --file </path/to/.wav> --models </path/to/models>"
+    print "Usage:" + sys.argv[0] + " --slang <en|fr|ru> --tlang <en|de|es|fr|pl> --file </path/to/.wav> --models </path/to/models>"
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'l:f:m:h', ['lang=', 'file=', 'models=', 'help'])
+    opts, args = getopt.getopt(sys.argv[1:], 's:t:f:m:h', ['slang=', 'tlang=', 'file=', 'models=', 'help'])
 except getopt.GetoptError:
     usage()
     sys.exit(2)
@@ -30,7 +30,9 @@ for opt, arg in opts:
     if opt in ('-h', '--help'):
         usage()
         sys.exit(2)
-    elif opt in ('-l', '--lang'):
+    elif opt in ('-s', '--slang'):
+        SOURCE_LANGUAGE = arg
+    elif opt in ('-t', '--tlang'):
         TRANSLATION_LANGUAGE = arg
     elif opt in ('-f', '--file'):
         WAVE_FILE = arg
@@ -159,7 +161,7 @@ translator = googletrans.Translator()
 print('Initializing model...')
 
 corrector = jamspell.TSpellCorrector()
-corrector.LoadLangModel('en.bin')
+corrector.LoadLangModel(MODEL_DIR + '/' + SOURCE_LANGUAGE + '.bin')
 
 model = ds.Model(MODEL, N_FEATURES, N_CONTEXT, ALPHABET, BEAM_WIDTH)
 model.enableDecoderWithLM(ALPHABET, LM, TRIE, LM_WEIGHT,
