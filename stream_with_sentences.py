@@ -27,6 +27,10 @@ except getopt.GetoptError:
     usage()
     sys.exit(2)
 
+if not opts:
+    usage()
+    sys.exit(2)
+
 for opt, arg in opts:
     if opt in ('-h', '--help'):
         usage()
