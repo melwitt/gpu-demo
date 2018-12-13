@@ -9,12 +9,54 @@ import collections
 import time
 import curses
 import textwrap
+import sys
+import getopt
+import locale
 
+SOURCE_LANGUAGE = ''
+TRANSLATION_LANGUAGE = ''
+WAVE_FILE = ''
+MODEL_DIR = ''
 
-MODEL = "models/output_graph.pbmm"
-ALPHABET = "models/alphabet.txt"
-LM = "models/lm.binary"
-TRIE = "models/trie"
+def usage():
+    print "Usage:" + sys.argv[0] + " --slang <en|fr|ru> --tlang <en|de|es|fr|pl> --file </path/to/.wav> --models </path/to/models>"
+
+try:
+    opts, args = getopt.getopt(sys.argv[1:], 's:t:f:m:h', ['slang=', 'tlang=', 'file=', 'models=', 'help'])
+except getopt.GetoptError:
+    usage()
+    sys.exit(2)
+
+for opt, arg in opts:
+    if opt in ('-h', '--help'):
+        usage()
+        sys.exit(2)
+    elif opt in ('-s', '--slang'):
+        SOURCE_LANGUAGE = arg
+    elif opt in ('-t', '--tlang'):
+        TRANSLATION_LANGUAGE = arg
+    elif opt in ('-f', '--file'):
+        WAVE_FILE = arg
+    elif opt in ('-m', '--models'):
+        MODEL_DIR = arg
+    else:
+        usage()
+        sys.exit(2)
+
+# Set locale for translated language or use default locale
+LOCALE = TRANSLATION_LANGUAGE + "_" + TRANSLATION_LANGUAGE.upper() + ".utf8"
+print "Locale set to " + LOCALE
+
+try: 
+    locale.setlocale(locale.LC_ALL, LOCALE)
+except locale.Error:
+    print "WARNING: Locale " + LOCALE + " not found. Ensure you have language pack installed! Falling back to default LOCALE" 
+    locale.setlocale(locale.LC_ALL, '')
+
+MODEL = MODEL_DIR + "/output_graph.pbmm"
+ALPHABET = MODEL_DIR + "/alphabet.txt"
+LM = MODEL_DIR + "/lm.binary"
+TRIE = MODEL_DIR + "/trie"
 
 LM_WEIGHT = 1.50
 VALID_WORD_COUNT_WEIGHT = 2.25
@@ -120,13 +162,13 @@ translator = googletrans.Translator()
 print('Initializing model...')
 
 corrector = jamspell.TSpellCorrector()
-corrector.LoadLangModel('en.bin')
+corrector.LoadLangModel(MODEL_DIR + '/' + SOURCE_LANGUAGE + '.bin')
 
 model = ds.Model(MODEL, N_FEATURES, N_CONTEXT, ALPHABET, BEAM_WIDTH)
 model.enableDecoderWithLM(ALPHABET, LM, TRIE, LM_WEIGHT,
                           VALID_WORD_COUNT_WEIGHT)
 
-fin = wave.open(sys.argv[1], 'rb')
+fin = wave.open(WAVE_FILE, 'rb')
 
 frame_rate = fin.getframerate()
 bit_depth = fin.getsampwidth()
@@ -178,7 +220,7 @@ try:
                 corrected = corrector.FixFragment(new_text)
                 segment_cache[i]['corrected'] = corrected
                 translated = translator.translate(corrected, src='en',
-                                                  dest='de').text
+                                                  dest=TRANSLATION_LANGUAGE).text
                 segment_cache[i]['translated'] = translated.encode('utf-8')
             text = ''.join([text, '' if not text else ' ',
                             segment_cache[i]['corrected']])
@@ -195,17 +237,17 @@ try:
         wrapped_text = textwrap.fill(text, win_width - 2)
         wrapped_translated_text = textwrap.fill(translated_text, win_width - 2)
         stdscr.addstr(0, 0, wrapped_text)
-        stdscr.addstr(5, 0, wrapped_translated_text, curses.color_pair(1))
+        stdscr.addstr(15, 0, wrapped_translated_text, curses.color_pair(1))
         stdscr.refresh()
     # Show the final output and re-translate
     stdscr.erase()
-    translated_text = translator.translate(text, src='en', dest='de').text
+    translated_text = translator.translate(text, src='en', dest=TRANSLATION_LANGUAGE).text
     wrapped_translated_text = textwrap.fill(translated_text.encode('utf8'),
                                             win_width)
     stdscr.addstr(0, 0, wrapped_text)
-    stdscr.addstr(5, 0, wrapped_translated_text, curses.color_pair(1))
+    stdscr.addstr(15, 0, wrapped_translated_text, curses.color_pair(1))
     stdscr.refresh()
-    time.sleep(5)
+    time.sleep(20)
 except KeyboardInterrupt:
     pass
 finally:
