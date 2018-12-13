@@ -16,5 +16,5 @@ Uses deepspeech and tensorflow to recognize voice recording in english and trans
 ## Usage
 The translation language can be anything supported by [google translate](https://cloud.google.com/translate/docs/languages). Use the ISO-639-1 code.
 ```
-$ python2 stream_with_sentences.py --lang <en|de|es|pl> --file </path/to/.wav> --models </path/to/models>
+$ python2 stream_with_sentences.py --slang <en|fr|ru> --tlang <en|fr|ru|pl> --file </path/to/.wav> --models </path/to/models>
 ```

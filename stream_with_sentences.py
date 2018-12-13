@@ -13,6 +13,7 @@ import sys
 import getopt
 import locale
 
+SOURCE_LANGUAGE = ''
 TRANSLATION_LANGUAGE = ''
 WAVE_FILE = ''
 MODEL_DIR = ''
